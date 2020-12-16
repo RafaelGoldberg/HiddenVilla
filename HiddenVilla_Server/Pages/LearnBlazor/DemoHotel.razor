@@ -1,0 +1,62 @@
+﻿@page "/DemoHotel"
+@using Model
+
+<h3 class="bg-light border p-2">Demo Hotel</h3>
+
+<div class="bg-light ">
+    <h1 class="text-primary text-center">Room List</h1>
+    <div class="row">
+        @foreach (var room in RoomsList)
+        {
+        <div class="bg-white m-3 p-3 col">
+            <h5>Room - @room.Id</h5>
+            <p>@room.RoomName</p>
+            <p>@room.Price</p>
+            <input type="checkbox" @bind-value="@room.IsActive" checked="@(@room.IsActive?"checked":null)" /> This room is @(room.IsActive? "Active": "Not Active")
+            <br />
+            @if (room.IsActive)
+            {
+                @foreach (var prop in room.RoomProps)
+                {
+                    <p>  @prop.Name - prop.Value</p>
+                }
+            }
+            <EditDeleteButton></EditDeleteButton>
+        </div>
+        }
+    </div>
+</div>
+
+@code {
+
+    List<BlazorRoom> RoomsList = new List<BlazorRoom>();
+
+    protected override void OnInitialized()
+    {
+        RoomsList.Add(new BlazorRoom()
+        {
+            Id = 110,
+            RoomName = "Villa one bedroom",
+            IsActive = true,
+            Price = 299,
+            RoomProps = new List<BlazorRoomProp>
+    {
+            new BlazorRoomProp{Id=1,Name="Sq Ft",Value="100"},
+            new BlazorRoomProp{Id=2,Name="Occupancy",Value="1"}
+        }
+        });
+
+        RoomsList.Add(new BlazorRoom()
+        {
+            Id = 210,
+            RoomName = "Villa Balcany",
+            IsActive = true,
+            Price = 499,
+            RoomProps = new List<BlazorRoomProp>
+    {
+            new BlazorRoomProp{Id=1,Name="Sq Ft",Value="300"},
+            new BlazorRoomProp{Id=2,Name="Occupancy",Value="3"}
+        }
+        });
+    }
+}
