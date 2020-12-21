@@ -1,0 +1,32 @@
+﻿
+@using HiddenVilla_Server.Model
+ 
+<div class="bg-white m-3 p-3 col">
+    <h5>Room - @Room.Id</h5>
+    <input type="checkbox" @onchange="RoomCheckboxSelectedChanged" />
+    <p>@Room.RoomName</p>
+    <p>@Room.Price</p>
+    <input type="checkbox" @bind-value="@Room.IsActive" checked="@(Room.IsActive?"checked":null)" /> This room is @(Room.IsActive? "Active": "Not Active")
+    <br />
+    @if (Room.IsActive)
+    {
+        @foreach (var prop in Room.RoomProps)
+        {
+            <p>  @prop.Name - prop.Value</p>
+        }
+    }
+    <EditDeleteButton IsAdmin="false"></EditDeleteButton>
+</div>
+
+@code {
+    [Parameter]
+    public BlazorRoom Room { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> OnRoomCheckboxSelection { get; set; }
+
+    protected async Task RoomCheckboxSelectedChanged(ChangeEventArgs e)
+    {
+        await OnRoomCheckboxSelection.InvokeAsync((bool)e.Value);
+    }
+}

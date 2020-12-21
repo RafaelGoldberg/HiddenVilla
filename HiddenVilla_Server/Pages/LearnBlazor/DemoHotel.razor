@@ -5,31 +5,40 @@
 
 <div class="bg-light ">
     <h1 class="text-primary text-center">Room List</h1>
+    <h4>Rooms Seleted - @SelectedRooms</h4>
     <div class="row">
         @foreach (var room in RoomsList)
         {
-        <div class="bg-white m-3 p-3 col">
-            <h5>Room - @room.Id</h5>
-            <p>@room.RoomName</p>
-            <p>@room.Price</p>
-            <input type="checkbox" @bind-value="@room.IsActive" checked="@(@room.IsActive?"checked":null)" /> This room is @(room.IsActive? "Active": "Not Active")
-            <br />
-            @if (room.IsActive)
-            {
-                @foreach (var prop in room.RoomProps)
-                {
-                    <p>  @prop.Name - prop.Value</p>
-                }
-            }
-            <EditDeleteButton></EditDeleteButton>
-        </div>
+            <IndividualRoom Room="@room" OnRoomCheckboxSelection="RoomSelectionCounterChanged"></IndividualRoom>
+        }
+    </div>
+    <h4>Hotel Amenities </h4>
+    <div class="row m-4">
+        @foreach (var amenities in Amenities)
+        {
+            <IndividualAmenities Amenities="@amenities"></IndividualAmenities>
         }
     </div>
 </div>
 
 @code {
 
+    public int SelectedRooms { get; set; } = 0;
     List<BlazorRoom> RoomsList = new List<BlazorRoom>();
+    List<BlazorHotelAmenities> Amenities = new List<BlazorHotelAmenities>();
+
+
+    protected void RoomSelectionCounterChanged(bool isRoomSelected)
+    {
+        if (isRoomSelected)
+        {
+            SelectedRooms++;
+        }
+        else
+        {
+            SelectedRooms--;
+        }
+    }
 
     protected override void OnInitialized()
     {
@@ -58,5 +67,15 @@
             new BlazorRoomProp{Id=2,Name="Occupancy",Value="3"}
         }
         });
+
+        Amenities.Add(new BlazorHotelAmenities()
+        {
+            Id = 25,
+            Name = "Gym",
+            Description= "24 hour gym with jaccuzi and hot bath"
+        });
+
+
+
     }
 }

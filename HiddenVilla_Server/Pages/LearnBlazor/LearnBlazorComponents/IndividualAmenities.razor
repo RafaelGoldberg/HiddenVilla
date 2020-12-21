@@ -1,0 +1,15 @@
+﻿
+@using HiddenVilla_Server.Model
+ 
+<div class="bg-white m-3 p-3 col">
+    <h5>Hotel Amenity - @Amenities.Id</h5>
+    <p>@Amenities.Name</p>
+    <p>@Amenities.Description</p>
+
+
+</div>
+
+@code {
+    [Parameter]
+    public BlazorHotelAmenities Amenities { get; set; }
+}

@@ -1,0 +1,20 @@
+﻿@page "/ParentComponent"
+
+<h1 class="text-danger">Parent Child Component</h1>
+<ChildComponent Title="this title was passed from parent" OnClickBtnMethod="ShowMessage">
+    This is some random stuff..
+</ChildComponent >
+
+
+
+  
+
+
+<p><b>@messageText</b></p>
+@code {
+    private string messageText = "";
+    private void ShowMessage(MouseEventArgs e)
+    {
+        messageText = "Blazing text from parent";
+    }
+}
