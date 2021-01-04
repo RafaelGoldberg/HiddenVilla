@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Models;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -37,10 +38,10 @@ namespace Business.Repository
         {
             try
             {
-                IEnumerable<HotelRoomDTO> hotelRoomDTOs =  _mapper.Map<IEnumerable<HotelRoom>, IEnumerable<HotelRoomDTO>>(_db.HotelRooms);
+                IEnumerable<HotelRoomDTO> hotelRoomDTOs =  _mapper.Map<IEnumerable<HotelRoom>, IEnumerable<HotelRoomDTO>>(_db.HotelRooms.Include(x => x.HotelRoomImages));
                 return hotelRoomDTOs;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
                 return null;
@@ -51,7 +52,7 @@ namespace Business.Repository
         {
             try
             {
-                HotelRoomDTO hotelRoom = _mapper.Map<HotelRoom , HotelRoomDTO>(await _db.HotelRooms.FirstOrDefaultAsync(x => x.Id == roomId));
+                HotelRoomDTO hotelRoom = _mapper.Map<HotelRoom , HotelRoomDTO>(await _db.HotelRooms.Include(x => x.HotelRoomImages).FirstOrDefaultAsync(x => x.Id == roomId));
                 return hotelRoom;
             }
             catch (Exception)
@@ -62,12 +63,21 @@ namespace Business.Repository
         }
 
         //checks if room name exists, if not returns the room object
-        public async Task<HotelRoomDTO> DoesRoomNameExist(string name)
+        public async Task<HotelRoomDTO> DoesRoomNameExist(string name , int roomId = 0)
         {
             try
             {
-                HotelRoomDTO hotelRoom = _mapper.Map<HotelRoom, HotelRoomDTO>(await _db.HotelRooms.FirstOrDefaultAsync(x => x.Name.ToLower() == name.ToLower()));
-                return hotelRoom;
+                if (roomId == 0)
+                {
+                    HotelRoomDTO hotelRoom = _mapper.Map<HotelRoom, HotelRoomDTO>(await _db.HotelRooms.FirstOrDefaultAsync(x => x.Name.ToLower() == name.ToLower()));
+                    return hotelRoom;
+                }
+                else
+                {
+                    HotelRoomDTO hotelRoom = _mapper.Map<HotelRoom, HotelRoomDTO>(await _db.HotelRooms.FirstOrDefaultAsync(x => x.Name.ToLower() == name.ToLower() && x.Id != roomId ));
+                    return hotelRoom;
+                }
+          
             }
             catch (Exception)
             {
@@ -110,6 +120,15 @@ namespace Business.Repository
             var roomDetails = await _db.HotelRooms.FindAsync(roomId);
             if (roomDetails != null)
             {
+                var allImages = await _db.HotelRoomImages.Where(x => x.RoomId == roomId).ToListAsync();
+                foreach (var image in allImages)
+                {
+                    if (File.Exists(image.RoomImageUrl))
+                    {
+                        File.Delete(image.RoomImageUrl);
+                    }
+                }
+                _db.HotelRoomImages.AddRange(allImages);
                 _db.HotelRooms.Remove(roomDetails);
                 return await _db.SaveChangesAsync();
             }
