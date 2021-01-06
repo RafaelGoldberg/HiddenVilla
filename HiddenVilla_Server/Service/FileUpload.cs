@@ -1,6 +1,7 @@
 ﻿using HiddenVilla_Server.Service.IService;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -13,9 +14,11 @@ namespace HiddenVilla_Server.Service
 
     {
         private readonly IWebHostEnvironment _webHostEnvironment;
-        public FileUpload(IWebHostEnvironment webHostEnvironment)
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        public FileUpload(IWebHostEnvironment webHostEnvironment, IHttpContextAccessor httpContextAccessor)
         {
             _webHostEnvironment = webHostEnvironment;
+            _httpContextAccessor = httpContextAccessor;
         }
         public async Task<string> UploadFile(IBrowserFile file)
         {
@@ -38,8 +41,8 @@ namespace HiddenVilla_Server.Service
                 {
                     memoryStream.WriteTo(fs);
                 }
-
-                var fullPath = $"RoomImages/{fileName}";
+                var url = $"{_httpContextAccessor.HttpContext.Request.Scheme}://{_httpContextAccessor.HttpContext.Request.Host.Value}/";
+                var fullPath = $"{url}RoomImages/{fileName}";
                 return fullPath;
 
             }
